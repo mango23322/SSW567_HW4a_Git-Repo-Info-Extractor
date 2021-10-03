@@ -30,24 +30,25 @@ def extractGitData(user):
     # get the data from the web address
     repos = requests.get(address)
 
-    # If the account does not have any repos, return appropriate text
-    if len(repos.json()) == 0:
-        return "No repos in user account"
-
     # repos contains a list that has an entry of data for each repository in the users account
     for i in range(len(repos.json())):
-        repo_info = repos.json()[i] # holds the info on the current repo 
+        try:
+            repo_info = repos.json()[i] # holds the info on the current repo 
+        # If the account does not have any repos, return appropriate text
+        except:
+            return noUser
+
         repos_dict[repo_info['name']] = 0 # add the name of the current repo to the dict
 
     for name in repos_dict:
         # web address that contains the commits for each repo
         repo_address = "https://api.github.com/repos/" + user + "/" + name +"/commits"
         current_repo = requests.get(repo_address) # get the data from the web address
-        count = current_repo.json()['commit'] # count the # of commits for the current repo
+        count = current_repo.text.count('parents') # count the # of commits for the current repo
         repos_dict[name] = count # add the count to the dictionary
 
     return(repos_dict)
-
+"""
 #main
 while True:
     username = input("Enter the user name: ")
@@ -55,5 +56,5 @@ while True:
     #data = extractGitData('mango23322')
 
     for i in data:
-        print(i + " : " + data[i])
-
+        print(i + " : " + str(data[i]))
+"""

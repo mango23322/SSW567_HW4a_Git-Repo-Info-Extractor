@@ -4,7 +4,7 @@ python:
 
 # install packages
 install:
-  - pip install requests
+  - python -m pip install requests
 
 # command to run tests
 script:
