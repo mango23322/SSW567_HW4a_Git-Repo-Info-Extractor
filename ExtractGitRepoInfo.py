@@ -53,7 +53,7 @@ def extractCommitData(user, repos_dict):
     return repos_dict
 
 #main
-
+"""
 invalidInput = 'Invalid Input'
 noUser = "User does not exist"
 
@@ -71,4 +71,4 @@ while True:
         data = extractCommitData(username, data) # find the # of commits for each repo, add the value to the dict, return the updated dict
         for i in data:
             print(i + " : " + str(data[i])) # print the dict key and the value for the users repos and commits
-
+"""
