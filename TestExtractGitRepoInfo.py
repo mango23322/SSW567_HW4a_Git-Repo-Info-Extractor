@@ -4,7 +4,6 @@ The primary goal of this file is to demonstrate a simple unittest implementation
 """
 
 import unittest
-import json
 from unittest import mock
 
 from ExtractGitRepoInfo import extractUserData, extractCommitData
@@ -18,38 +17,36 @@ class TestExtractGitRepoInfo(unittest.TestCase):
     def mockResponse(self, json_data):
         """returns the mock response for the json data"""
         mock_response = mock.Mock()
-        mock_response.json = mock.Mock(return_value = json_data)
+        mock_response.json = mock.Mock(return_value = json_data) # mocks the return of requests.get
         return mock_response
 
     @mock.patch('requests.get')
     def testGetRepoNames(self, mockedReq):
         """test retreiving the get repos, ensure that the correct number of repos are retrieved (2)"""
+        # mock the return of request.get from "https://api.github.com/users/" + user + "/repos"
         mockedReq.return_value = self.mockResponse(json_data = [{"name":"repo1"},{"name": "repo2"}])
         self.assertEqual(len(extractUserData("user")),2)
 
-
     @mock.patch('requests.get')
     def testGetCommits(self, mockedReq):
+        """Test the number of commits for a repo"""
+        # mock the return of request.get from "https://api.github.com/repos/" + user + "/" + name +"/commits"
         mockedReq.return_value = self.mockResponse(json_data = [{"parents":"1"},{"parents":"2"},{"parents":"3"}])
-        x = extractCommitData("user",{"repo1" : 0})
-        print (x)
-"""
-    # the repo 'squareD' has two commits and is not being updated so it should be static
-    # so I am only focusing on this repo for this test
-    def testSquareDHasTwoCommits(self): 
-        self.assertEqual(extractGitData("mango23322")['SquareD'],2)
+        git_dict = extractCommitData("user",{"repo1" : 0})
+        self.assertEqual(git_dict["repo1"],3)
 
-    # test the count of the number of public repos 
-    def testCountOfRepos(self): 
-        self.assertEqual(len(extractGitData("mango23322")),4)
+    @mock.patch('requests.get')
+    def testBadUsername(self, mockedReq):
+        """Test a username that does not exist"""
+        # mock the return of request.get from "https://api.github.com/users/" + user + "/repos using a bad user ID"
+        bad_message ={'message': 'Not Found', 'documentation_url': 'https://docs.github.com/rest/reference/repos#list-repositories-for-a-user'}
+        mockedReq.return_value = self.mockResponse(json_data = bad_message)
+        self.assertEqual(extractUserData("badusername"),"User does not exist")
 
-    def testNotAUser(self): 
-        self.assertEqual(extractGitData("ad;fjae;ifjdjfadf"),"User does not exist")   
- 
-    def testNotAString(self): 
-        self.assertEqual(extractGitData(1234),"Invalid Input")  
-"""
+    def testwrongInputType(self):
+        """Test inputting a non string as the username"""
+        self.assertEqual(extractUserData(1234),"Invalid Input")
+
 if __name__ == '__main__':
     print('Running unit tests')
     unittest.main()
-
