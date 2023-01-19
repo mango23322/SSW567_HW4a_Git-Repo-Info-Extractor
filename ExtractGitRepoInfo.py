@@ -15,6 +15,7 @@ def extractUserData(user):
     """
     invalid_input = 'Invalid Input'
     no_user = "User does not exist"
+    x = 5
 
     repos_dict = {} # dict of repos for current user and commits for each repo
 
